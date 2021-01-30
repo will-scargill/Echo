@@ -1,0 +1,18 @@
+﻿<Window x:Class="Echo.Screens.ConnectionScreen"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Echo.Screens"
+        mc:Ignorable="d"
+        Title="ConnectionScreen" Height="450" Width="800">
+    <Grid>
+        <TextBox x:Name="txtBoxIPAddr" HorizontalAlignment="Left" Height="44" Margin="60,70,0,0" TextWrapping="Wrap" Text="127.0.0.1" VerticalAlignment="Top" Width="204"/>
+        <TextBox x:Name="txtBoxPort" HorizontalAlignment="Left" Height="40" Margin="60,137,0,0" TextWrapping="Wrap" Text="16000" VerticalAlignment="Top" Width="204"/>
+        <Button x:Name="btnConnect" Content="Button" HorizontalAlignment="Left" Height="44" Margin="60,204,0,0" VerticalAlignment="Top" Width="204" Click="btnConnect_Click"/>
+        <CheckBox x:Name="chkBoxAnon" Content="CheckBox" HorizontalAlignment="Left" Margin="60,267,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="txtBoxUsername" HorizontalAlignment="Left" Height="46" Margin="346,126,0,0" TextWrapping="Wrap" Text="Will" VerticalAlignment="Top" Width="201"/>
+        <PasswordBox x:Name="txtBoxPass" HorizontalAlignment="Left" Height="42" Margin="346,192,0,0" VerticalAlignment="Top" Width="201" Password="mypassword"/>
+
+    </Grid>
+</Window>
