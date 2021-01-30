@@ -29,6 +29,8 @@ namespace Echo.Managers
             if (ip == "127.0.0.1")
             {
                 userID = EncryptionManager.SHA256HAsh(KeyGenerator.GetUniqueKey(16)); // Allows me to run two clients on the same device with the eIDs interfering
+                VisualManager.SystemMessage("Connecting in local development mode");
+                VisualManager.SystemMessage("eID is " + userID);
             }
             else
             {
@@ -52,6 +54,7 @@ namespace Echo.Managers
             {
                 conn.Connect(remoteEP);
                 receiving = true;
+                VisualManager.SystemMessage("Connected to server");
                 return true;
             }
             catch (System.Net.Sockets.SocketException)

@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
+using Echo.Objects;
+
 namespace Echo.Managers
 {
     class VisualManager
@@ -35,6 +37,22 @@ namespace Echo.Managers
         {
             MainWindow.main.Dispatcher.Invoke(() => {
                 MainWindow.main.listBoxUsers.Items.Clear();
+            });
+        }
+
+        public static void ClearChan()
+        {
+            MainWindow.main.Dispatcher.Invoke(() => {
+                MainWindow.main.listBoxChannels.Items.Clear();
+            });
+        }
+
+        public static void SystemMessage(string message)
+        {
+            Message sysMessage = new Message("System", message, DateTime.Now.ToString(), "#000000"); 
+
+            MainWindow.main.Dispatcher.Invoke(() => {
+                MainWindow.main.listBoxMessages.Items.Add(sysMessage);
             });
         }
     }

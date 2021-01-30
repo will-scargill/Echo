@@ -54,7 +54,8 @@ namespace Echo.Screens
                 if (message["messagetype"] == "CRAccepted")
                 {
                     NetworkManager.ReceiveMessages();
-                    VisualManager.Cleanup();
+                    VisualManager.ClearUsers();
+                    VisualManager.ClearChan();
                     Close();
                 }
                 else if (message["messagetype"] == "CRDenied")
