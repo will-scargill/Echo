@@ -29,7 +29,11 @@ namespace Echo.Screens
 
         private void btnConnect_Click(object sender, RoutedEventArgs e)
         {
-            if (NetworkManager.Connect(txtBoxIPAddr.Text, Convert.ToInt32(txtBoxPort.Text)))
+            if (NetworkManager.receiving == true)
+            {
+                NetworkManager.Disconnect();
+            }
+            if (NetworkManager.Connect(txtBoxIPAddr.Text, Convert.ToInt32(txtBoxPort.Text), (bool)chkBoxAnon.IsChecked))
             {
                 //lblConnStatus.Content = "connected";
 

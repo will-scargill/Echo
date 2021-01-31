@@ -24,12 +24,12 @@ namespace Echo.Managers
 
         public static Dictionary<string, object> serverInfo = new Dictionary<string, object>();
 
-        public static bool Connect(string ip, int port)
+        public static bool Connect(string ip, int port, bool anon)
         {
-            if (ip == "127.0.0.1")
+            if (anon)
             {
-                userID = EncryptionManager.SHA256HAsh(KeyGenerator.GetUniqueKey(16)); // Allows me to run two clients on the same device with the eIDs interfering
-                VisualManager.SystemMessage("Connecting in local development mode");
+                userID = EncryptionManager.SHA256HAsh(KeyGenerator.GetUniqueKey(32));
+                VisualManager.SystemMessage("Connecting in anonymous mode");
                 VisualManager.SystemMessage("eID is " + userID);
             }
             else
