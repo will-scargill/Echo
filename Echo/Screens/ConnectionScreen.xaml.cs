@@ -47,7 +47,9 @@ namespace Echo.Screens
 
                 message = NetworkManager.ReceiveMessage(true); // Receive gotSecret
 
-                List<string> connRequest = new List<string> { txtBoxUsername.Text, txtBoxPass.Password };
+                List<string> config = ConfigManager.ReadSettings();
+
+                List<string> connRequest = new List<string> { txtBoxUsername.Text, txtBoxPass.Password, config[0] };
 
                 string jsonConnReq = JsonConvert.SerializeObject(connRequest);
 
