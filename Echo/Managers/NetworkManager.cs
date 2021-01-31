@@ -59,6 +59,7 @@ namespace Echo.Managers
             }
             catch (System.Net.Sockets.SocketException)
             {
+                VisualManager.SystemMessage("Failed to connect to server");
                 return false;
             }
         }
@@ -196,6 +197,16 @@ namespace Echo.Managers
                             case "userlistUpdate":
                                 {
                                     // Placeholder
+                                }
+                                break;
+                            case "channelHistory":
+                                {
+                                    Net.channelHistory.Handle(message);
+                                }
+                                break;
+                            case "additionalHistory":
+                                {
+                                    Net.additionalHistory.Handle(message);
                                 }
                                 break;
                             case "errorOccured":

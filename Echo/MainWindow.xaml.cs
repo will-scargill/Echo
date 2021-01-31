@@ -111,5 +111,19 @@ namespace Echo
                 VisualManager.ClearMessages();
             }
         }
+
+        private void listBoxMessages_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            if (NetworkManager.receiving == true && listBoxMessages.Items.Count >= 50)
+            {
+                Border border = (Border)VisualTreeHelper.GetChild(listBoxMessages, 0);
+                ScrollViewer scrollViewer = (ScrollViewer)VisualTreeHelper.GetChild(border, 0);
+
+                if (scrollViewer.VerticalOffset == 0)
+                {
+                    NetworkManager.SendMessage("historyRequest", "");
+                }
+            }           
+        }
     }
 }

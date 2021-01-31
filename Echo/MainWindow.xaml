@@ -33,7 +33,7 @@
         </DockPanel>
 
         <DockPanel Grid.Column="1" Grid.Row="1" >
-            <ListBox x:Name="listBoxMessages">
+            <ListBox x:Name="listBoxMessages" ScrollViewer.ScrollChanged="listBoxMessages_ScrollChanged">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <DockPanel LastChildFill="True">

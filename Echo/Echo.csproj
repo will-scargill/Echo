@@ -59,6 +59,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Managers\VisualManager.cs" />
+    <Compile Include="Net\additionalHistory.cs" />
+    <Compile Include="Net\channelHistory.cs" />
     <Compile Include="Net\channelUpdate.cs" />
     <Compile Include="Net\serverInfo.cs" />
     <Compile Include="Screens\ConnectionScreen.xaml.cs">
