@@ -31,6 +31,7 @@ namespace Echo.Managers
                 userID = EncryptionManager.SHA256HAsh(KeyGenerator.GetUniqueKey(32));
                 VisualManager.SystemMessage("Connecting in anonymous mode...");
                 VisualManager.SystemMessage("eID is " + userID);
+                //userID = "testid";
             }
             else
             {
@@ -45,8 +46,6 @@ namespace Echo.Managers
 
                 VisualManager.SystemMessage("Connecting...");
             }
-            
-
 
             IPAddress ipAddress = IPAddress.Parse(ip);
             IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
@@ -74,9 +73,9 @@ namespace Echo.Managers
 
             NetworkManager.serverInfo.Clear();
 
-            conn.Close();
-
             VisualManager.Cleanup();
+
+            conn.Close();
         }
 
         public static void SendMessage(string messagetype, string data, string subtype = "", List<string> metadata = null, bool enc = true)
@@ -216,6 +215,11 @@ namespace Echo.Managers
                                     Net.commandData.Handle(message);
                                 }
                                 break;
+                            case "connectionTerminated":
+                                {
+                                    Net.connectionTerminated.Handle(message);
+                                }
+                                break;
                             case "errorOccured":
                                 {
                                     MessageBox.Show("Error - " + message["data"]);
@@ -235,11 +239,10 @@ namespace Echo.Managers
             {
                 if (receiving == true)
                 {
-                    //MessageBox.Show("Error - Connection Lost"); // annoying while developing
-                    VisualManager.SystemMessage("Error - Connection Lost");
+                    //MessageBox.Show("Error - Connection Lost"); // annoying while developing                    
                     NetworkManager.serverInfo.Clear();
                     Disconnect();
-
+                    VisualManager.SystemMessage("Error - Connection Lost");
                 }
             }
         }

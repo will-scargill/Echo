@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 using Echo.Managers;
-using System.Windows;
+using Echo.Objects;
 
 namespace Echo.Net
 {
@@ -19,7 +19,12 @@ namespace Echo.Net
             NetworkManager.serverInfo["channel"] = channels;
             NetworkManager.serverInfo["motd"] = serverData[1];
 
-            MainWindow.main.Dispatcher.Invoke(() => { 
+            MainWindow.main.Dispatcher.Invoke(() => {
+
+                Message motdMessage = new Message("Server", NetworkManager.serverInfo["motd"].ToString(), DateTime.Now.ToString(), "#0000FF");
+
+                MainWindow.main.listBoxMessages.Items.Add(motdMessage);
+
                 foreach (string channel in channels)
                 {
                     MainWindow.main.listBoxChannels.Items.Add(channel);
