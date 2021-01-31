@@ -82,6 +82,7 @@
     <Compile Include="Net\additionalHistory.cs" />
     <Compile Include="Net\channelHistory.cs" />
     <Compile Include="Net\channelUpdate.cs" />
+    <Compile Include="Net\commandData.cs" />
     <Compile Include="Net\serverInfo.cs" />
     <Compile Include="Screens\ConnectionScreen.xaml.cs">
       <DependentUpon>ConnectionScreen.xaml</DependentUpon>

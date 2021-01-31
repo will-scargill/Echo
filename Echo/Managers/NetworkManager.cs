@@ -29,7 +29,7 @@ namespace Echo.Managers
             if (anon)
             {
                 userID = EncryptionManager.SHA256HAsh(KeyGenerator.GetUniqueKey(32));
-                VisualManager.SystemMessage("Connecting in anonymous mode");
+                VisualManager.SystemMessage("Connecting in anonymous mode...");
                 VisualManager.SystemMessage("eID is " + userID);
             }
             else
@@ -42,6 +42,8 @@ namespace Echo.Managers
                 ).FirstOrDefault();
 
                 userID = EncryptionManager.SHA256HAsh(macAddr);
+
+                VisualManager.SystemMessage("Connecting...");
             }
             
 
@@ -209,6 +211,11 @@ namespace Echo.Managers
                                     Net.additionalHistory.Handle(message);
                                 }
                                 break;
+                            case "commandData":
+                                {
+                                    Net.commandData.Handle(message);
+                                }
+                                break;
                             case "errorOccured":
                                 {
                                     MessageBox.Show("Error - " + message["data"]);
@@ -228,7 +235,8 @@ namespace Echo.Managers
             {
                 if (receiving == true)
                 {
-                    MessageBox.Show("Error - Connection Lost");
+                    //MessageBox.Show("Error - Connection Lost"); // annoying while developing
+                    VisualManager.SystemMessage("Error - Connection Lost");
                     NetworkManager.serverInfo.Clear();
                     Disconnect();
 
