@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using System.Windows;
 
 using Echo.Managers;
 
@@ -24,8 +26,7 @@ namespace Echo.Net
             {
                 VisualManager.SystemMessage("You have been banned from the server");
             }
-
-            //NetworkManager.conn.Close();
+            VisualManager.SystemMessage(message["data"]);
         }
     }
 }
