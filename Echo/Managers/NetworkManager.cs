@@ -269,12 +269,13 @@ namespace Echo.Managers
             }
             else
             {
-                List<string> jsonEnc = JsonConvert.DeserializeObject<List<string>> (jsonData);
+                List<string> jsonEnc = JsonConvert.DeserializeObject<List<string>>(jsonData);
                 string jsonMessage = EncryptionManager.Decrypt(jsonEnc[0], KeyGenerator.SecretKey, jsonEnc[1]);
                 message = JsonConvert.DeserializeObject<Dictionary<string, string>>(jsonMessage);
-            }           
+            }
 
-            return message;   
+            return message;
         }
     }
 }
+

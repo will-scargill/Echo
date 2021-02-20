@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -35,43 +36,52 @@ namespace Echo.Screens
             }
             if (NetworkManager.Connect(txtBoxIPAddr.Text, Convert.ToInt32(txtBoxPort.Text), (bool)chkBoxAnon.IsChecked))
             {
-                //lblConnStatus.Content = "connected";
-
-                NetworkManager.SendMessage("serverInfoRequest", "", enc: false);
-
-                Dictionary<string, string> message = NetworkManager.ReceiveMessage(); // Receive serverInfo
-
-                KeyGenerator.SecretKey = KeyGenerator.GetUniqueKey(16);
-
-                NetworkManager.SendMessage("clientSecret", EncryptionManager.RSAEncrypt(KeyGenerator.SecretKey, message["data"].ToString()), enc: false);
-
-                message = NetworkManager.ReceiveMessage(true); // Receive gotSecret
-
-                List<string> config = ConfigManager.ReadSettings();
-
-                List<string> connRequest = new List<string> { txtBoxUsername.Text, txtBoxPass.Password, config[0] };
-
-                string jsonConnReq = JsonConvert.SerializeObject(connRequest);
-
-                NetworkManager.SendMessage("connectionRequest", jsonConnReq);
-
-                message = NetworkManager.ReceiveMessage(true);
-
-                if (message["messagetype"] == "CRAccepted")
+                try
                 {
-                    NetworkManager.ReceiveMessages();
-                    VisualManager.ClearUsers();
-                    VisualManager.ClearChan();
-                    Close();
+                    NetworkManager.SendMessage("serverInfoRequest", "", enc: false);
+
+                    Dictionary<string, string> message = NetworkManager.ReceiveMessage(); // Receive serverInfo
+
+                    KeyGenerator.SecretKey = KeyGenerator.GetUniqueKey(16);
+
+                    NetworkManager.SendMessage("clientSecret", EncryptionManager.RSAEncrypt(KeyGenerator.SecretKey, message["data"].ToString()), enc: false);
+
+                    message = NetworkManager.ReceiveMessage(true); // Receive gotSecret
+
+                    List<string> config = ConfigManager.ReadSettings();
+
+                    List<string> connRequest = new List<string> { txtBoxUsername.Text, txtBoxPass.Password, config[0] };
+
+                    string jsonConnReq = JsonConvert.SerializeObject(connRequest);
+
+                    NetworkManager.SendMessage("connectionRequest", jsonConnReq);
+
+                    message = NetworkManager.ReceiveMessage(true);
+
+                    if (message["messagetype"] == "CRAccepted")
+                    {
+                        NetworkManager.ReceiveMessages();
+                        VisualManager.ClearUsers();
+                        VisualManager.ClearChan();
+                        VisualManager.SystemMessage("Handshake complete");
+                        Close();
+                    }
+                    else if (message["messagetype"] == "CRDenied")
+                    {
+                        VisualManager.SystemMessage("Connection denied - " + message["data"]);
+                        Close();
+                    }
                 }
-                else if (message["messagetype"] == "CRDenied")
+                catch (System.Net.Sockets.SocketException)
                 {
-                    MessageBox.Show("Connection denied - " + message["data"]);
+                    
+                    VisualManager.SystemMessage("Connection was lost during handshake");
+                    Close();
                 }
             }
             else
             {
-                MessageBox.Show("Connection failed");
+                VisualManager.SystemMessage("Connection failed");
             }
         }
     }
