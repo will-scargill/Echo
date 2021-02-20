@@ -22,6 +22,7 @@
             <Menu x:Name="menuMain" HorizontalAlignment="Stretch">
                 <MenuItem Header="Connection" Click="menuConnect_Click"/>
                 <MenuItem Header="Settings"/>
+                <MenuItem Header="Leave Channel" Click="menuLeaveChan_Click"/>
                 <MenuItem Header="Disconnect" Click="menuDisconn_Click"/>
                 <MenuItem Header="Exit" Click="menuExit_Click"/>
             </Menu>

@@ -103,6 +103,17 @@ namespace Echo
             Close();
         }
 
+        private void menuLeaveChan_Click(object sender, RoutedEventArgs e)
+        {
+            if (listBoxChannels.SelectedItem != null)
+            {
+                NetworkManager.SendMessage("leaveChannel", "");
+                VisualManager.ClearMessages();
+                VisualManager.ClearUsers();
+                listBoxChannels.UnselectAll();
+            }
+        }
+
         private void listBoxChannels_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (listBoxChannels.SelectedItem != null)
