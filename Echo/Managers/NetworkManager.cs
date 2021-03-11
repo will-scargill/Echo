@@ -13,6 +13,7 @@ using System.Runtime.Remoting.Channels;
 using System.Diagnostics;
 
 using Echo.Net;
+using Echo.Screens;
 
 namespace Echo.Managers
 {
@@ -23,6 +24,7 @@ namespace Echo.Managers
         public static bool receiving;
 
         public static Dictionary<string, object> serverInfo = new Dictionary<string, object>();
+        private static Dictionary<string, object> handshakeInfo = new Dictionary<string, object>();
 
         public static bool Connect(string ip, int port, bool anon)
         {
@@ -31,7 +33,7 @@ namespace Echo.Managers
                 userID = EncryptionManager.SHA256HAsh(KeyGenerator.GetUniqueKey(32));
                 VisualManager.SystemMessage("Connecting in anonymous mode...");
                 VisualManager.SystemMessage("eID is " + userID);
-                //userID = "testid";
+                userID = "testid";
             }
             else
             {
@@ -238,11 +240,20 @@ namespace Echo.Managers
             catch (System.Net.Sockets.SocketException)
             {
                 if (receiving == true)
-                {
-                    //MessageBox.Show("Error - Connection Lost"); // annoying while developing                    
+                {               
                     NetworkManager.serverInfo.Clear();
                     Disconnect();
                     VisualManager.SystemMessage("Error - Connection Lost");
+                    VisualManager.SystemMessage("Trying to reconnect");
+                    for (int reconnCounter = 0; reconnCounter < 3; reconnCounter++)
+                    {
+                        bool reconnSuccess = NetworkManager.Handshake((string)handshakeInfo["ip"], (int)handshakeInfo["port"], (bool)handshakeInfo["anon"], (string)handshakeInfo["username"], (string)handshakeInfo["password"]);
+                        if (reconnSuccess)
+                        {
+                            VisualManager.SystemMessage("Reconnect successful");
+                            break;
+                        }
+                    }              
                 }
             }
         }
@@ -275,6 +286,84 @@ namespace Echo.Managers
             }
 
             return message;
+        }
+
+        public static bool Handshake(string IPAddr, int port, bool anon, string username, string password, ConnectionScreen connSc = null)
+        {
+            if (NetworkManager.receiving == true)
+            {
+                NetworkManager.Disconnect();
+                return true;
+            }
+            if (NetworkManager.Connect(IPAddr, port, (bool)anon))
+            {
+                try
+                {
+                    NetworkManager.SendMessage("serverInfoRequest", "", enc: false);
+
+                    Dictionary<string, string> message = NetworkManager.ReceiveMessage(); // Receive serverInfo
+
+                    KeyGenerator.SecretKey = KeyGenerator.GetUniqueKey(16);
+
+                    NetworkManager.SendMessage("clientSecret", EncryptionManager.RSAEncrypt(KeyGenerator.SecretKey, message["data"].ToString()), enc: false);
+
+                    message = NetworkManager.ReceiveMessage(true); // Receive gotSecret
+
+                    string version = ConfigManager.GetSetting("version");
+
+                    List<string> connRequest = new List<string> { username, password, version };
+
+                    string jsonConnReq = JsonConvert.SerializeObject(connRequest);
+
+                    NetworkManager.SendMessage("connectionRequest", jsonConnReq);
+
+                    message = NetworkManager.ReceiveMessage(true);
+
+                    if (message["messagetype"] == "CRAccepted")
+                    {
+                        NetworkManager.ReceiveMessages();
+                        VisualManager.ClearUsers();
+                        VisualManager.ClearChan();
+                        VisualManager.SystemMessage("Handshake complete");
+                        if (connSc != null)
+                        {
+                            connSc.Close();
+                        }
+                        handshakeInfo["ip"] = IPAddr;
+                        handshakeInfo["port"] = port;
+                        handshakeInfo["username"] = username;
+                        handshakeInfo["password"] = password;
+                        handshakeInfo["anon"] = anon;
+
+                        return true;
+                    }
+                    else if (message["messagetype"] == "CRDenied")
+                    {
+                        VisualManager.SystemMessage("Connection denied - " + message["data"]);
+                        if (connSc != null)
+                        {
+                            connSc.Close();
+                        }
+                        return false;
+                    }
+                    return false;
+                }
+                catch (System.Net.Sockets.SocketException)
+                {
+
+                    VisualManager.SystemMessage("Connection was lost during handshake");
+                    if (connSc != null)
+                    {
+                        connSc.Close();
+                    }
+                    return false;
+                }
+            }
+            else
+            {
+                VisualManager.SystemMessage("Connection failed");
+                return false;
+            }
         }
     }
 }

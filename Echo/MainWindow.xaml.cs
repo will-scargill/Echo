@@ -19,6 +19,7 @@ using Echo.Managers;
 using Echo.Screens;
 using Newtonsoft.Json;
 using System.Diagnostics;
+using Echo.Objects;
 
 namespace Echo
 {
@@ -135,6 +136,50 @@ namespace Echo
                     NetworkManager.SendMessage("historyRequest", "");
                 }
             }           
+        }
+
+        private void UsersContext_whois(object sender, RoutedEventArgs e)
+        {
+            if (listBoxUsers.SelectedItem != null)
+            {
+                NetworkManager.SendMessage("userMessage", "/whois " + listBoxUsers.SelectedItem.ToString());
+            }
+        }
+        private void UsersContext_kick(object sender, RoutedEventArgs e)
+        {
+            if (listBoxUsers.SelectedItem != null)
+            {
+                NetworkManager.SendMessage("userMessage", "/kick " + listBoxUsers.SelectedItem.ToString());
+            }
+        }
+        private void UsersContext_ban(object sender, RoutedEventArgs e)
+        {
+            if (listBoxUsers.SelectedItem != null)
+            {
+                NetworkManager.SendMessage("userMessage", "/ban " + listBoxUsers.SelectedItem.ToString());
+            }
+        }
+        private void UsersContext_mute(object sender, RoutedEventArgs e)
+        {
+            if (listBoxUsers.SelectedItem != null)
+            {
+                NetworkManager.SendMessage("userMessage", "/mute " + listBoxUsers.SelectedItem.ToString());
+            }
+        }
+        private void UsersContext_unmute(object sender, RoutedEventArgs e)
+        {
+            if (listBoxUsers.SelectedItem != null)
+            {
+                NetworkManager.SendMessage("userMessage", "/unmute " + listBoxUsers.SelectedItem.ToString());
+            }
+        }
+        private void MessagesContext_copy(object sender, RoutedEventArgs e)
+        {
+            if (listBoxMessages.SelectedItem != null)
+            {
+                Message selectedMessage = (Message)listBoxMessages.SelectedItem;
+                Clipboard.SetText(selectedMessage.Content);
+            }
         }
     }
 }

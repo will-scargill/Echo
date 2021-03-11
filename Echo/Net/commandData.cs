@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 using Echo.Objects;
+using System.Windows.Media;
+using System.Windows.Controls;
 
 namespace Echo.Net
 {
@@ -24,6 +26,13 @@ namespace Echo.Net
                     {
                         Message newMessage = new Message(metadata[0], line, metadata[2], metadata[1]);
                         MainWindow.main.listBoxMessages.Items.Add(newMessage);
+                    }
+
+                    if (VisualTreeHelper.GetChildrenCount(MainWindow.main.listBoxMessages) > 0)
+                    {
+                        Border border = (Border)VisualTreeHelper.GetChild(MainWindow.main.listBoxMessages, 0);
+                        ScrollViewer scrollViewer = (ScrollViewer)VisualTreeHelper.GetChild(border, 0);
+                        scrollViewer.ScrollToBottom();
                     }
                 });
             }

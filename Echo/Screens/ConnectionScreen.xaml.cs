@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,63 +28,42 @@ namespace Echo.Screens
         public ConnectionScreen()
         {
             InitializeComponent();
+            txtBoxUsername.Text = ConfigManager.GetSetting("username");
         }
 
         private void btnConnect_Click(object sender, RoutedEventArgs e)
         {
-            if (NetworkManager.receiving == true)
+            ConfigManager.UpdateSetting("username", txtBoxUsername.Text);
+            string ip;
+            try
             {
-                NetworkManager.Disconnect();
+                IPAddress.Parse(txtBoxIPAddr.Text); // parse this to check it is valid ip
+                ip = txtBoxIPAddr.Text;
             }
-            if (NetworkManager.Connect(txtBoxIPAddr.Text, Convert.ToInt32(txtBoxPort.Text), (bool)chkBoxAnon.IsChecked))
+            catch (System.FormatException)
             {
-                try
-                {
-                    NetworkManager.SendMessage("serverInfoRequest", "", enc: false);
-
-                    Dictionary<string, string> message = NetworkManager.ReceiveMessage(); // Receive serverInfo
-
-                    KeyGenerator.SecretKey = KeyGenerator.GetUniqueKey(16);
-
-                    NetworkManager.SendMessage("clientSecret", EncryptionManager.RSAEncrypt(KeyGenerator.SecretKey, message["data"].ToString()), enc: false);
-
-                    message = NetworkManager.ReceiveMessage(true); // Receive gotSecret
-
-                    List<string> config = ConfigManager.ReadSettings();
-
-                    List<string> connRequest = new List<string> { txtBoxUsername.Text, txtBoxPass.Password, config[0] };
-
-                    string jsonConnReq = JsonConvert.SerializeObject(connRequest);
-
-                    NetworkManager.SendMessage("connectionRequest", jsonConnReq);
-
-                    message = NetworkManager.ReceiveMessage(true);
-
-                    if (message["messagetype"] == "CRAccepted")
-                    {
-                        NetworkManager.ReceiveMessages();
-                        VisualManager.ClearUsers();
-                        VisualManager.ClearChan();
-                        VisualManager.SystemMessage("Handshake complete");
-                        Close();
-                    }
-                    else if (message["messagetype"] == "CRDenied")
-                    {
-                        VisualManager.SystemMessage("Connection denied - " + message["data"]);
-                        Close();
-                    }
-                }
-                catch (System.Net.Sockets.SocketException)
-                {
-                    
-                    VisualManager.SystemMessage("Connection was lost during handshake");
-                    Close();
-                }
+                ip = "0";
             }
-            else
+
+            int port;
+            try
             {
-                VisualManager.SystemMessage("Connection failed");
+                port = Convert.ToInt32(txtBoxPort.Text);
             }
+            catch (System.FormatException) // NaN
+            {
+                port = 0;
+            }
+            catch (System.OverflowException) // Number too large for int32
+            {
+                port = 0;
+            }
+
+            if (port > 65535)
+            {
+                port = 0;
+            }
+            NetworkManager.Handshake(ip, port, (bool)chkBoxAnon.IsChecked, txtBoxUsername.Text, txtBoxPass.Password, connSc: this);
         }
     }
 }

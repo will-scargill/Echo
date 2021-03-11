@@ -19,6 +19,11 @@ namespace Echo.Managers
 
         }
 
+        public static string GetSetting(string setting)
+        {
+            return ConfigurationManager.AppSettings.Get(setting);
+        }
+
         public static void UpdateSetting(string setting, string newValue)
         {
             XmlDocument xmlDoc = new XmlDocument();

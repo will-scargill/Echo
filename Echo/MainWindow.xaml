@@ -34,7 +34,7 @@
         </DockPanel>
 
         <DockPanel Grid.Column="1" Grid.Row="1" >
-            <ListBox x:Name="listBoxMessages" ScrollViewer.ScrollChanged="listBoxMessages_ScrollChanged">
+            <ListBox x:Name="listBoxMessages" ScrollViewer.ScrollChanged="listBoxMessages_ScrollChanged" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <DockPanel LastChildFill="True">
@@ -46,13 +46,27 @@
                         </DockPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
+                <ListBox.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Copy message" Click="MessagesContext_copy"/>
+                    </ContextMenu>
+                </ListBox.ContextMenu>
             </ListBox>
 
         </DockPanel>
 
         <DockPanel Grid.Column="2" Grid.Row="1" >
-            <ListBox x:Name="listBoxUsers"/>
-
+            <ListBox x:Name="listBoxUsers">
+                <ListBox.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="whois" Click="UsersContext_whois"/>
+                        <MenuItem Header="kick" Click="UsersContext_kick"/>
+                        <MenuItem Header="ban" Click="UsersContext_ban"/>
+                        <MenuItem Header="mute" Click="UsersContext_mute"/>
+                        <MenuItem Header="unmute" Click="UsersContext_unmute"/>
+                    </ContextMenu>
+                </ListBox.ContextMenu>
+            </ListBox>
         </DockPanel>
 
         <DockPanel Grid.Column="2" Grid.Row="2">

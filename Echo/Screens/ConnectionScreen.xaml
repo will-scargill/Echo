@@ -11,7 +11,7 @@
         <TextBox x:Name="txtBoxPort" HorizontalAlignment="Left" Height="40" Margin="60,137,0,0" TextWrapping="Wrap" Text="16000" VerticalAlignment="Top" Width="204"/>
         <Button x:Name="btnConnect" Content="connect" HorizontalAlignment="Left" Height="44" Margin="60,204,0,0" VerticalAlignment="Top" Width="204" Click="btnConnect_Click"/>
         <CheckBox x:Name="chkBoxAnon" Content="anonymous mode" HorizontalAlignment="Left" Margin="60,267,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="txtBoxUsername" HorizontalAlignment="Left" Height="46" Margin="323,70,0,0" TextWrapping="Wrap" Text="Will" VerticalAlignment="Top" Width="201"/>
+        <TextBox x:Name="txtBoxUsername" HorizontalAlignment="Left" Height="46" Margin="323,70,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="201"/>
         <PasswordBox x:Name="txtBoxPass" HorizontalAlignment="Left" Height="42" Margin="323,137,0,0" VerticalAlignment="Top" Width="201" Password="mypassword"/>
 
     </Grid>
