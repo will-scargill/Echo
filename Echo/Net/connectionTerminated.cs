@@ -26,6 +26,14 @@ namespace Echo.Net
             {
                 VisualManager.SystemMessage("You have been banned from the server");
             }
+            else if (message["subtype"] == "shutdown")
+            {
+                VisualManager.SystemMessage("Connection terminated by the server");
+            }
+            else
+            {
+                VisualManager.SystemMessage("Connection terminated by the server");
+            }
             VisualManager.SystemMessage(message["data"]);
         }
     }

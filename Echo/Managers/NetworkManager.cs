@@ -14,6 +14,7 @@ using System.Diagnostics;
 
 using Echo.Net;
 using Echo.Screens;
+using System.Threading.Tasks;
 
 namespace Echo.Managers
 {
@@ -241,7 +242,6 @@ namespace Echo.Managers
             {
                 if (receiving == true)
                 {               
-                    NetworkManager.serverInfo.Clear();
                     Disconnect();
                     VisualManager.SystemMessage("Error - Connection Lost");
                     VisualManager.SystemMessage("Trying to reconnect");
@@ -251,12 +251,18 @@ namespace Echo.Managers
                         if (reconnSuccess)
                         {
                             VisualManager.SystemMessage("Reconnect successful");
+
+                            //SendMessage("requestInfo", "");
+
+                            // Task.Delay(500).ContinueWith(t => ServerInfoCheck());
+
                             break;
                         }
                     }              
                 }
             }
         }
+
 
         public static void ReceiveMessages()
         {
@@ -334,6 +340,8 @@ namespace Echo.Managers
                         handshakeInfo["username"] = username;
                         handshakeInfo["password"] = password;
                         handshakeInfo["anon"] = anon;
+
+                        SendMessage("requestInfo", "");
 
                         return true;
                     }
