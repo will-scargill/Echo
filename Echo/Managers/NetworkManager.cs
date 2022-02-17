@@ -34,7 +34,7 @@ namespace Echo.Managers
                 userID = EncryptionManager.SHA256HAsh(KeyGenerator.GetUniqueKey(32));
                 VisualManager.SystemMessage("Connecting in anonymous mode...");
                 VisualManager.SystemMessage("eID is " + userID);
-                userID = "testid";
+                //userID = "testid";
             }
             else
             {
@@ -145,7 +145,26 @@ namespace Echo.Managers
                     {
                         if (jsonData[0].Equals('[') && jsonData[(jsonData.Length - 1)].Equals(']'))
                         {
-                            netQueue.Enqueue(jsonData);
+                            if (jsonData.Contains("]["))
+                            {
+                                string[] splitMessages = jsonData.Split(new string[] { "][" }, StringSplitOptions.None);
+                                for (int i = 0; i < splitMessages.Length; i++)
+                                {
+                                    if (splitMessages[i][0] != '[')
+                                    {
+                                        splitMessages[i] = "[" + splitMessages[i];
+                                    }
+                                    if (splitMessages[i][splitMessages[i].Length-1] != ']')
+                                    {
+                                        splitMessages[i] += "]";
+                                    }
+                                    netQueue.Enqueue(splitMessages[i]);
+                                }
+                            }
+                            else
+                            {
+                                netQueue.Enqueue(jsonData);
+                            }            
                         }
                         else
                         {
@@ -170,11 +189,20 @@ namespace Echo.Managers
                         }
                     }
                     
-                    
 
-                    foreach(string netMessage in netQueue)
+                    foreach (string netMessage in netQueue)
                     {
-                        List<string> encryptedData = JsonConvert.DeserializeObject<List<string>>(netMessage);
+                        List<string> encryptedData = null;
+                        try
+                        {
+                            encryptedData = JsonConvert.DeserializeObject<List<string>>(netMessage);
+                        }
+                        catch (Newtonsoft.Json.JsonReaderException)
+                        {
+                            netQueue.Enqueue(jsonData.Substring(0, jsonData.IndexOf("][") + 1));
+                            netQueue.Enqueue(jsonData.Substring(jsonData.IndexOf("][") + 1));      
+                            break;
+                        }
 
                         jsonData = EncryptionManager.Decrypt(encryptedData[0], KeyGenerator.SecretKey, encryptedData[1]);
 

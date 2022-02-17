@@ -29,11 +29,13 @@ namespace Echo.Screens
         {
             InitializeComponent();
             txtBoxUsername.Text = ConfigManager.GetSetting("username");
+            txtBoxIPAddr.Text = ConfigManager.GetSetting("last_ip");
         }
 
         private void btnConnect_Click(object sender, RoutedEventArgs e)
         {
             ConfigManager.UpdateSetting("username", txtBoxUsername.Text);
+            ConfigManager.UpdateSetting("last_ip", txtBoxIPAddr.Text);
             string ip;
             try
             {
@@ -42,7 +44,14 @@ namespace Echo.Screens
             }
             catch (System.FormatException)
             {
-                ip = "0";
+                try
+                {
+                    ip = (Dns.GetHostAddresses(txtBoxIPAddr.Text))[0].ToString();
+                }
+                catch (System.Net.Sockets.SocketException)
+                {
+                    ip = "0";
+                }
             }
 
             int port;
