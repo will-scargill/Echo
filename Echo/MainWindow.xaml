@@ -1,0 +1,73 @@
+﻿<Window x:Class="Echo.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:bh="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:local="clr-namespace:Echo" 
+        xmlns:views="clr-namespace:Echo.Views"
+        xmlns:vms="clr-namespace:Echo.ViewModels"
+        mc:Ignorable="d"
+        Title="ECHO" Height="500" Width="800" MinWidth="550" MinHeight="300" Closing="Window_Closing"      
+        >
+    <Grid>
+        <Grid.Resources>
+            <DataTemplate DataType="{x:Type vms:ConnectionViewModel}">
+                <views:ConnectionView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vms:ChatViewModel}">
+                <views:ChatView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vms:SettingsViewModel}">
+                <views:SettingsView/>
+            </DataTemplate>
+        </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="15"/>
+        </Grid.RowDefinitions>
+        <Menu x:Name="menuMain" HorizontalAlignment="Stretch" Grid.Row="0">
+            <MenuItem Header="Connection">
+                <MenuItem Header="Connections" Command="{Binding ViewConnectionsCommand}"/>
+                <MenuItem Header="Join last" Command="{Binding JoinLastCommand}"/>
+                <MenuItem Header="Disconnect" Command="{Binding DisconnCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Settings" Command="{Binding ViewSettingsCommand}"/>
+            <MenuItem Header="Server">
+                <MenuItem Header="Leave Channel" Command="{Binding LeaveChannelCommand}"/>
+                <MenuItem Header="View all users" Command="{Binding GetUsersCommand}"/>
+                <MenuItem Header="View all roles" Command="{Binding GetRolesCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Exit" Command="{Binding ExitCommand}"/>
+        </Menu>
+   
+        <ContentControl Content="{Binding CurrentViewModel}" Grid.Row="1"/>
+
+        <!--<views:ConnectionView DataContext="{Binding CurrentViewModel}" Grid.Row="1"/>-->
+
+        <StatusBar x:Name="connectionStatusBar" Height="15"
+                   Grid.Row="2"
+                   Background="{Binding ConnStatusColour}">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+
+            <StatusBarItem Height="15" Grid.Column="0">
+                <TextBlock Text="{Binding ConnStatusText}" FontSize="11" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </StatusBarItem>
+            <StatusBarItem x:Name="statusBarVersion" Height="15" Grid.Column="2" HorizontalContentAlignment="Right">
+                <TextBlock x:Name="sbvText" FontSize="11" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </StatusBarItem>
+        </StatusBar>
+
+    </Grid>
+</Window>

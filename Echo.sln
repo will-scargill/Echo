@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32630.192
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Echo", "Echo\Echo.csproj", "{55078830-41EB-4EB8-B06F-9770EC69E058}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "EchoInstaller", "EchoInstaller\EchoInstaller.vdproj", "{9E3689E5-6D4E-4058-9921-2ACCC7355356}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{55078830-41EB-4EB8-B06F-9770EC69E058}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55078830-41EB-4EB8-B06F-9770EC69E058}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55078830-41EB-4EB8-B06F-9770EC69E058}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55078830-41EB-4EB8-B06F-9770EC69E058}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E3689E5-6D4E-4058-9921-2ACCC7355356}.Debug|Any CPU.ActiveCfg = Debug
+		{9E3689E5-6D4E-4058-9921-2ACCC7355356}.Release|Any CPU.ActiveCfg = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7990F147-F144-47C7-8A94-22A559FE903A}
+	EndGlobalSection
+EndGlobal

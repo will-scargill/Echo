@@ -1,0 +1,125 @@
+﻿<UserControl x:Class="Echo.Views.ChatView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:local="clr-namespace:Echo.Views"
+             xmlns:b="clr-namespace:Echo.Behaviours"
+             xmlns:listBoxBehavior="clr-namespace:ListBoxBehavior;assembly=ListBoxBehavior" xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
+             mc:Ignorable="d" 
+             d:DesignHeight="500" d:DesignWidth="800">
+    <UserControl.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="150"/>
+            <ColumnDefinition MinWidth="150"/>
+            <ColumnDefinition Width="150"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+
+        <ListBox Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" x:Name="listBoxChannels"
+                 ItemsSource="{Binding Channels}" SelectedItem="{Binding SelectedChannel}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding ChannelName}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <ListBox Grid.Column="1" Grid.Row="0" x:Name="listBoxMessages" MinWidth="100"
+                 ItemsSource="{Binding Messages}" SelectedItem="{Binding SelectedMessage, UpdateSourceTrigger=PropertyChanged}"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 ScrollViewer.ScrollChanged="scrollChanged"
+                 IsSynchronizedWithCurrentItem="True"
+                 listBoxBehavior:ListBoxBehavior.AutoScroll="True" ScrollViewer.CanContentScroll="False">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <DockPanel LastChildFill="True">
+                        <TextBlock>
+                            <Run Text="{Binding Timestamp, Mode=OneWay}"/>
+                            <Run Text=" | "/>
+                            <Run Text="{Binding Username, Mode=OneWay}" Foreground="{Binding Colour}"/>
+                            <Run Text=": "/>
+                        </TextBlock>
+                        <TextBox DockPanel.Dock="Left" Text="{Binding Content,Mode=OneWay}" IsReadOnly="True" 
+                                 TextWrapping="Wrap" BorderBrush="Transparent" Background="Transparent"/>
+                    </DockPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <ListBox.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Copy Content" Command="{Binding MessageContextCommand}" CommandParameter="copy_content"/>
+                    <MenuItem Header="Copy Username" Command="{Binding MessageContextCommand}" CommandParameter="copy_username"/>
+                    <MenuItem Header="Copy Timestamp" Command="{Binding MessageContextCommand}" CommandParameter="copy_timestamp"/>
+                    <MenuItem Header="Delete Message" Command="{Binding MessageContextCommand}" CommandParameter="delete"/>
+                </ContextMenu>
+            </ListBox.ContextMenu>
+        </ListBox>
+
+        <ListBox Grid.Column="2" Grid.Row="0" x:Name="listBoxClients"
+                 ItemsSource="{Binding ChannelMembers}" SelectedItem="{Binding SelectedClient, UpdateSourceTrigger=PropertyChanged}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding ClientName}" Foreground="{Binding Colour}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <ListBox.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Copy Username"/>
+                    <MenuItem Header="Commands">
+                        <MenuItem Header="Kick" Command="{Binding UserContextCommand}" CommandParameter="kick"/>
+                        <MenuItem Header="Ban" Command="{Binding UserContextCommand}" CommandParameter="ban"/>
+                        <MenuItem Header="Mute" Command="{Binding UserContextCommand}" CommandParameter="mute"/>
+                        <MenuItem Header="Unmute" Command="{Binding UserContextCommand}" CommandParameter="unmute"/>
+                        <MenuItem Header="Whois" Command="{Binding UserContextCommand}" CommandParameter="whois"/>
+                    </MenuItem>
+                </ContextMenu>
+            </ListBox.ContextMenu>
+        </ListBox>
+
+        <Grid Grid.Column="1" Grid.Row="1" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="100"/>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Margin="5 5 5 5" x:Name="textBoxUserMessage" Template="{StaticResource inputTextBox}" 
+                     VerticalContentAlignment="Center"
+                     FontSize="14"
+                     Text="{Binding UserMessage, UpdateSourceTrigger=PropertyChanged}"
+                     >
+                <TextBox.InputBindings>
+                    <KeyBinding
+                        Key="Return"
+                        Command="{Binding SendMessageCommand}"
+                        CommandParameter="{Binding Path=Text, RelativeSource={RelativeSource AncestorType={x:Type TextBox}}}" />
+                </TextBox.InputBindings>
+            </TextBox>
+
+            <Button Grid.Column="1" Content="Submit" Margin="5 5 5 5" x:Name="btnSubmitMessage"
+                    FontSize="14"
+                    FontWeight="Medium"
+                    Command="{Binding SendMessageCommand}"
+                    Template="{StaticResource niceButton}"/>
+        </Grid>
+
+        <Grid Grid.Column="2" Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Button Template="{StaticResource niceButton}" Content="Emojis" Margin="5 5 5 5" Grid.Column="0" IsEnabled="False"/>
+            <Button Template="{StaticResource niceButton}" Content="GIFs" Margin="5 5 5 5" Grid.Column="1" IsEnabled="False"/>
+            <Button Template="{StaticResource niceButton}" Content="Cmds" Margin="5 5 5 5" Grid.Column="2" IsEnabled="False"/>
+        </Grid>
+    </Grid>
+</UserControl>

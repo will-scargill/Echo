@@ -1,0 +1,147 @@
+﻿<UserControl x:Class="Echo.Views.ConnectionView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:w="clr-namespace:Echo.Managers"
+             mc:Ignorable="d" 
+             d:DesignHeight="500" d:DesignWidth="800">
+    <UserControl.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.InputBindings>
+            <KeyBinding
+                Key="Return"
+                Command="{Binding ConnectCommand}"/>
+        </Grid.InputBindings>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="75"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="88*"/>
+            <RowDefinition Height="90*"/>
+            <RowDefinition Height="110*"/>
+            <RowDefinition Height="91*"/>
+        </Grid.RowDefinitions>
+
+        <!-- <Label Content="ECHO" Grid.Column="0" Grid.Row="0"
+               FontWeight="Heavy"
+               FontSize="25" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,15,0,0"/> -->
+
+        <Grid Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" Margin="0,25,0,0" >
+            <Grid>
+                <!--<Rectangle Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" Fill="#6e675f" 
+                           Height="75"/>-->
+                
+            </Grid>
+            <Grid>
+                <Image Grid.Column="0" Grid.Row="0" Source="/Views/echo_tr.png" HorizontalAlignment="Left"/>
+            </Grid>
+        </Grid>       
+        
+
+        <Grid Grid.Column="0" Grid.Row="1" Margin="15,0,0,0" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <Label Content="IP Address" Grid.Column="0" Grid.Row="0"
+                   FontSize="15" FontWeight="Medium" HorizontalContentAlignment="Center" VerticalContentAlignment="Bottom"/>
+
+            <Label Content="Port" Grid.Column="1" Grid.Row="0"
+                   FontSize="15" FontWeight="Medium" HorizontalContentAlignment="Center" VerticalContentAlignment="Bottom"/>
+
+            <TextBox x:Name="textboxIPAddress" Grid.Column="0" Grid.Row="1" Height="40" Margin="5,5,10,5"
+                     Template="{StaticResource inputTextBox}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                     Text="{Binding IPAddress, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBox x:Name="textboxPort" Grid.Column="1" Grid.Row="1" Height="40" Margin="10,5,5,5"
+                     Template="{StaticResource inputTextBox}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                     Text="{Binding Port, UpdateSourceTrigger=PropertyChanged}"/>
+
+        </Grid>
+
+        <Grid Grid.Column="0" Grid.Row="2" Margin="15,0,0,0" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <Label Content="Username" Grid.Column="0" Grid.Row="0"
+                   FontSize="15" FontWeight="Medium" HorizontalContentAlignment="Center" VerticalContentAlignment="Bottom"/>
+
+            <Label Content="Password" Grid.Column="1" Grid.Row="0"
+                   FontSize="15" FontWeight="Medium" HorizontalContentAlignment="Center" VerticalContentAlignment="Bottom"/>
+
+            <TextBox x:Name="textboxUsername" Grid.Column="0" Grid.Row="1" Height="40" Margin="5,5,10,5"
+                     Template="{StaticResource inputTextBox}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                     Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <PasswordBox x:Name="textboxPassword" Grid.Column="1" Grid.Row="1" Height="40" Margin="10,5,5,5" Template="{StaticResource inputPasswordBox}"
+                    HorizontalContentAlignment="Center" VerticalContentAlignment="Center" w:PasswordHelper.Attach="True"
+                         w:PasswordHelper.Password="{Binding Password, Mode=TwoWay}"/>
+
+        </Grid>
+
+        <Grid Grid.Column="0" Grid.Row="3" Margin="15,0,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <CheckBox Grid.Column="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                      Margin="15,0,0,0" Content="Connect Anonymously"
+                      IsChecked="{Binding Anonymous, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <Button Template="{StaticResource niceButton}" Content="Connect" 
+                    Margin="5 5 5 5" Height="50"
+                    Grid.Column="1" Width="Auto"
+                    Command="{Binding ConnectCommand}"/>
+
+        </Grid>
+
+        <ListBox x:Name="listboxPresets" Grid.Column="2" Grid.Row="1" Grid.RowSpan="2" Margin="5,50,20,5"
+                 ItemsSource="{Binding Presets}" SelectedItem="{Binding SelectedPreset, UpdateSourceTrigger=PropertyChanged}">
+
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding ServerName}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <ListBox.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Delete Preset" Command="{Binding DeletePresetCommand}"/>
+                </ContextMenu>
+            </ListBox.ContextMenu>
+        </ListBox>
+
+        <Grid Grid.Column="2" Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            
+            <TextBox x:Name="textboxPresetName" Grid.Column="0" Height="40" Margin="5,5,10,5"
+                     Template="{StaticResource inputTextBox}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                     Text="{Binding PresetName, UpdateSourceTrigger=PropertyChanged}"/>
+            
+            <Button Template="{StaticResource niceButton}" Content="Save as preset" 
+                    Margin="5,5,20,0" Height="50"
+                    Grid.Column="1" Width="Auto"
+                    Command="{Binding NewPresetCommand}"/>
+        </Grid>
+    </Grid>
+</UserControl>
