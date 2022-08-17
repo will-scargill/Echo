@@ -2,16 +2,41 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0-windows10.0.22000.0</TargetFramework>
     <UseWPF>true</UseWPF>
+    <SupportedOSPlatformVersion>10.0.22000.0</SupportedOSPlatformVersion>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="ViewModels\" />
+    <None Remove="App.config~RF60b74700.TMP" />
+    <None Remove="Commands\DeletePresetCommand.cs~RF4d3636c1.TMP" />
+    <None Remove="Models\Channel.cs~RF6059c66a.TMP" />
+    <None Remove="Models\Client.cs~RF60489bf2.TMP" />
+    <None Remove="ViewModels\ChannelMemberViewModel.cs~RF605fbd45.TMP" />
+    <None Remove="ViewModels\ChatViewModel.cs~RF603f21bc.TMP" />
+    <None Remove="ViewModels\MainViewModel.cs~RF6054ad2d.TMP" />
+    <None Remove="ViewModels\MessageViewModel.cs~RF6049626e.TMP" />
+    <None Remove="Views\ConnectionView.xaml~RF5c11ad28.TMP" />
+    <None Remove="Views\echo_tr.png" />
+    <None Remove="Views\echo_tr_white.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Emoji.Wpf" Version="0.3.3" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="ListBoxBehavior">
+      <HintPath>ListBoxBehavior.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Views\echo_tr.png" />
+    <Resource Include="Views\echo_tr_white.png" />
   </ItemGroup>
 
 </Project>

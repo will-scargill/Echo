@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Echo.Models
 {
-    class Permission
+    public class Permission
     {
         private readonly string _name;
         private readonly string _flag;

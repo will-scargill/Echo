@@ -1,17 +1,24 @@
 ﻿using Echo.Managers;
+using Echo.Net;
+using Echo.ViewModels;
 using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Echo.Models
 {
-    class Server
+    public class Server
     {
+        private readonly EchoClient _echo;
+
         private readonly IPAddress _ipAddress;
 
         private readonly int _port;
@@ -25,8 +32,11 @@ namespace Echo.Models
         private readonly User _user;
 
         private List<Channel> _channelList { get; set; }
+        public ObservableCollection<ChannelViewModel> channelList { get; set; }
 
         private List<Client> _clientList { get; set; }
+        public ObservableCollection<ChannelMemberViewModel> currentChannelClientList { get; set; }
+        public ObservableCollection<MessageViewModel> currentChannelMessageList { get; set; }
 
         private List<Permission> _allPermissions { get; set; }
 
@@ -34,7 +44,7 @@ namespace Echo.Models
 
         private string _serverMOTD { get; set; }
 
-        public Server(string ipAddress, int port, string password, User user)
+        public Server(string ipAddress, int port, string password, User user, EchoClient echo)
         {
             try
             {
@@ -43,14 +53,111 @@ namespace Echo.Models
             catch (System.FormatException)
             {
 
-                throw;
+                throw new InvalidOperationException();
             }
             _serverPassword = password;
             _port = port;
             _receiving = false;
             _user = user;
             _channelList = new List<Channel>();
+            channelList = new ObservableCollection<ChannelViewModel>();
             _clientList = new List<Client>();
+            currentChannelClientList = new ObservableCollection<ChannelMemberViewModel>();
+            currentChannelMessageList = new ObservableCollection<MessageViewModel>();
+            _echo = echo;
+
+            _clientList.Add(new Client("Server", "NO_EID_SERVER", "#0000FF"));
+        }
+
+        public void AddChannel(string name)
+        {
+            Channel newChannel = new Channel(name);
+            _channelList.Add(newChannel);
+            channelList.Add(new ChannelViewModel(newChannel));
+        }
+
+        public Channel GetChannel(string name)
+        {
+            foreach (Channel c in _channelList)
+            {
+                if (c.GetName() == name)
+                {
+                    return c;
+                }
+            }
+            return null;
+        }
+
+        public Channel GetCurrentChannel()
+        {
+            return _echo.GetCurrentChannel();
+        }
+
+        public void AddClient(Client c)
+        {
+            _clientList.Add(c);
+        }
+
+        public void AddClientVisible(Client c)
+        {
+            currentChannelClientList.Add(new ChannelMemberViewModel(c));
+        }
+
+        public void RemoveClient(string name)
+        {
+            foreach (Client c in _clientList)
+            {
+                if (c.GetUsername() == name)
+                {
+                    foreach (Channel chan in _channelList)
+                    {
+                        chan.RemoveUser(name);
+                    }
+                    _clientList.Remove(c);
+                    break;
+                }
+            }
+        }
+
+        public void RemoveClientVisible(string name)
+        {
+            foreach (ChannelMemberViewModel c in currentChannelClientList)
+            {
+                if (c.ClientName == name)
+                {
+                    currentChannelClientList.Remove(c);
+                    break;
+                }
+            }
+        }
+
+        public Client GetClientByName(string name)
+        {
+            foreach (Client c in _clientList)
+            {
+                if (c.GetUsername() == name && c.GetEchoID() != "unavailable")
+                {
+                    return c;
+                }
+            }
+            return null;
+        }
+
+        public Client GetClientByID(string eID)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Client GetHistoricalClient(string name)
+        {
+            foreach (Client c in _clientList)
+            {
+                if (c.GetUsername() == name && c.GetEchoID() == "unavailable")
+                {
+                    return c;
+                }
+            }
+            return null;
         }
 
         public bool Connect()
@@ -70,62 +177,68 @@ namespace Echo.Models
             }
         }
 
-        public bool Handshake()
+        public async Task<bool> Handshake()
         {
-            if (_receiving)
-            {
-                Disconnect();
-                _receiving = false;
-            }
-            if (Connect())
-            {
-                try
+            return await Task.Run(() => {
+                if (_receiving)
                 {
-                    Dictionary<string, string> message;
-
-                    SendMessageToServer("serverInfoRequest", "", enc: false);
-
-                    message = ReceiveMessageFromServer(); // Receive serverInfo
-
-                    KeyGenerator.SecretKey = KeyGenerator.GetUniqueKey(16);
-
-                    SendMessageToServer("clientSecret", EncryptionManager.RSAEncrypt(KeyGenerator.SecretKey, message["data"].ToString()), enc: false);
-
-                    message = ReceiveMessageFromServer(true); // Receive gotSecret
-
-                    string version = ConfigManager.GetSetting("version");
-
-                    List<string> connRequest = new List<string> { _user.Username, _serverPassword, version };
-
-                    string jsonConnRequest = JsonConvert.SerializeObject(connRequest);
-
-                    SendMessageToServer("connectionRequest", jsonConnRequest);
-
-                    message = ReceiveMessageFromServer(true);
-
-                    if (message["messagetype"] == "CRAccepted")
+                    Disconnect();
+                    _receiving = false;
+                }
+                if (Connect())
+                {
+                    try
                     {
-                        return true;
+                        Dictionary<string, string> message;
+
+                        SendMessageToServer("serverInfoRequest", "", enc: false);
+
+                        message = ReceiveMessageFromServer(); // Receive serverInfo
+
+                        KeyGenerator.SecretKey = KeyGenerator.GetUniqueKey(16);
+
+                        SendMessageToServer("clientSecret", EncryptionManager.RSAEncrypt(KeyGenerator.SecretKey, message["data"].ToString()), enc: false);
+
+                        message = ReceiveMessageFromServer(true); // Receive gotSecret
+
+                        string version = ConfigManager.GetSetting("version");
+
+                        List<string> connRequest = new List<string> { _user.Username, _serverPassword, version, "" };
+
+                        string jsonConnRequest = JsonConvert.SerializeObject(connRequest);
+
+                        SendMessageToServer("connectionRequest", jsonConnRequest);
+
+                        message = ReceiveMessageFromServer(true);
+
+                        if (message["messagetype"] == "CRAccepted")
+                        {
+                            NetworkManager.registerServer(this);
+                            return true;
+                        }
+                        else if (message["messagetype"] == "CRDenied")
+                        {
+                            _receiving = false;
+                            _conn?.Close();
+                            _echo.connectionContext = message["data"];
+                            return false;
+                        }
+                        return false;
                     }
-                    else if (message["messagetype"] == "CRDenied")
+                    catch (System.Net.Sockets.SocketException)
                     {
                         _receiving = false;
                         _conn?.Close();
+                        _echo.connectionContext = "Failed to connect to server";
                         return false;
                     }
-                    return false;
                 }
-                catch (System.Net.Sockets.SocketException)
+                else
                 {
-                    _receiving = false;
-                    _conn?.Close();
+                    _echo.connectionContext = "Failed to connect to server";
                     return false;
                 }
-            }
-            else
-            {
-                return false;
-            }
+            });
         }
 
         public void Disconnect()
@@ -294,52 +407,51 @@ namespace Echo.Models
 
                         Dictionary<string, string> message = JsonConvert.DeserializeObject<Dictionary<string, string>>(jsonData);
 
-
                         switch (message["messagetype"])
                         {
                             case "serverData":
                                 {
-
+                                    serverData.Handle(this, message);
                                 }
                                 break;
                             case "outboundMessage":
                                 {
-
+                                    outboundMessage.Handle(this, _echo, message);
                                 }
                                 break;
                             case "channelUpdate":
                                 {
-
+                                    channelUpdate.Handle(this, _echo, message);
                                 }
                                 break;
                             case "userlistUpdate":
                                 {
-
+                                    userlistUpdate.Handle(this, _echo, message);
                                 }
                                 break;
                             case "channelHistory":
                                 {
-
+                                    channelHistory.Handle(this, _echo, message);
                                 }
                                 break;
                             case "additionalHistory":
                                 {
-
+                                    additionalHistory.Handle(this, _echo, message);
                                 }
                                 break;
                             case "commandData":
                                 {
-
+                                    commandData.Handle(this, _echo, message);
                                 }
                                 break;
                             case "connectionTerminated":
                                 {
-
+                                    connectionTerminated.Handle(this, _echo, message);
                                 }
                                 break;
                             case "errorOccured":
                                 {
-
+                                    errorOccured.Handle(this, _echo, message);
                                 }
                                 break;
                             default:
@@ -357,23 +469,39 @@ namespace Echo.Models
                 if (_receiving == true)
                 {
                     Disconnect();
+                    App.Current.Dispatcher.Invoke(() => { _echo.ConnectionStatus = ConnectionStatus.Reconnecting;  });
+
                     //VisualManager.SystemMessage("Error - Connection Lost");
                     //VisualManager.SystemMessage("Trying to reconnect");
+
+                    bool reconnSuccess = false;
+
                     for (int reconnCounter = 0; reconnCounter < 3; reconnCounter++)
-                    {
-                        bool reconnSuccess = Handshake();
+                    {                       
+                        reconnSuccess = Task.Run(Handshake).Result;
+
                         if (reconnSuccess)
                         {
-                            //VisualManager.SystemMessage("Reconnect successful");
+                            
+                            App.Current.Dispatcher.Invoke(() => {
+                                this.currentChannelClientList.Clear();
+                                this._clientList.Clear();
+                                _echo.ConnectionStatus = ConnectionStatus.Connected;
+                                ReceiveMessages();
+                            });
 
-                            //SendMessage("requestInfo", "");
-
-                            // Task.Delay(500).ContinueWith(t => ServerInfoCheck());
+                            //Task.Delay(500).ContinueWith(t => ServerInfoCheck());
 
                             break;
                         }
                     }
-
+                    if (!reconnSuccess)
+                    {
+                        App.Current.Dispatcher.Invoke(() => {
+                            _echo.ConnectionStatus = ConnectionStatus.Terminated;
+                            _echo.connectionContext = "Failed to reconnect";
+                        });
+                    }                                     
                 }
             }
         }

@@ -4,17 +4,19 @@ using System.Text;
 
 namespace Echo.Models
 {
-    class User
+    public class User
     {
-        public string Username;
-        public string eID;
-        public bool anonymous;
+        public string Username { get; set; }
+        public string eID { get; set; }
+        public bool anonymous { get; set; }
+        public List<Permission> permissions { get; set; }
 
         public User(string username, string eID, bool anonymous)
         {
-            Username = username;
+            this.Username = username;
             this.eID = eID;
             this.anonymous = anonymous;
+            this.permissions = new List<Permission>();
         }
     }
 }

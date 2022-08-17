@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Echo.Managers;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +25,15 @@ namespace Echo
         public MainWindow()
         {
             InitializeComponent();
+
+            this.sbvText.Text = "Echo Version " + ConfigManager.GetSetting("version");
+
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            NetworkManager.getServer()?.Disconnect();
+            System.Windows.Application.Current.Shutdown();
         }
     }
 }

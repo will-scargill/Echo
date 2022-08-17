@@ -31,7 +31,7 @@ namespace Echo.Managers
         public static string SHA256HAsh(string text)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(text);
-            SHA256Managed hashstring = new SHA256Managed();
+            SHA256 hashstring = SHA256.Create();
             byte[] hash = hashstring.ComputeHash(bytes);
             string hashString = string.Empty;
             foreach (byte x in hash)
@@ -62,7 +62,7 @@ namespace Echo.Managers
         public static List<object> Encrypt(string plaintext)
         {
             List<object> dataToReturn = new List<object> { };
-            using (AesManaged aes = new AesManaged())
+            using (Aes aes = Aes.Create())
             {
                 aes.Key = Encoding.UTF8.GetBytes(KeyGenerator.SecretKey);
 
@@ -88,7 +88,7 @@ namespace Echo.Managers
         {
             byte[] encrypted;
             // Create a new AesManaged.    
-            using (AesManaged aes = new AesManaged())
+            using (Aes aes = Aes.Create())
             {
                 // Create encryptor    
                 ICryptoTransform encryptor = aes.CreateEncryptor(Key, IV);
@@ -115,7 +115,7 @@ namespace Echo.Managers
         {
             string plaintext = null;
             // Create AesManaged    
-            using (AesManaged aes = new AesManaged())
+            using (Aes aes = Aes.Create())
             {
                 // Create a decryptor    
                 ICryptoTransform decryptor = aes.CreateDecryptor(Key, IV);
@@ -136,14 +136,8 @@ namespace Echo.Managers
 
         public class PemKeyUtils // Adapted from https://stackoverflow.com/questions/17128038/c-sharp-rsa-encryption-decryption-with-transmission
         {
-            const String pemprivheader = "-----BEGIN RSA PRIVATE KEY-----";
-            const String pemprivfooter = "-----END RSA PRIVATE KEY-----";
             const String pempubheader = "-----BEGIN PUBLIC KEY-----";
             const String pempubfooter = "-----END PUBLIC KEY-----";
-            const String pemp8header = "-----BEGIN PRIVATE KEY-----";
-            const String pemp8footer = "-----END PRIVATE KEY-----";
-            const String pemp8encheader = "-----BEGIN ENCRYPTED PRIVATE KEY-----";
-            const String pemp8encfooter = "-----END ENCRYPTED PRIVATE KEY-----";
 
             static bool verbose = false;
 
