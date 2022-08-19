@@ -14,8 +14,11 @@
     <img src="https://imgur.com/MSGdWAz.png" alt="Logo">
   </a>
   <br>
+  <a href="https://github.com/will-scargill/echo">
+    Echo Client
+  </a>
   <a href="https://github.com/will-scargill/echo-server">
-    Echo Server
+     | Echo Server
   </a>
 </p>
 
