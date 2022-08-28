@@ -19,7 +19,11 @@ namespace Echo.Managers
 
         public static void UpdateSetting(string setting, string newValue)
         {
-            ConfigurationManager.AppSettings.Set(setting, newValue);
+            var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            config.AppSettings.Settings[setting].Value = newValue;
+            config.Save(ConfigurationSaveMode.Modified);
+
+            ConfigurationManager.RefreshSection("appSettings");
         }
 
         public static Dictionary<string, List<object>> ReadPresetFile()

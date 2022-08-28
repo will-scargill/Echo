@@ -1,6 +1,7 @@
 ﻿using Echo.Models;
 using Echo.Stores;
 using Echo.ViewModels;
+using Echo.Managers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -72,6 +73,10 @@ namespace Echo.Commands
         }
         public override void Execute(object parameter)
         {
+            ConfigManager.UpdateSetting("last_used_username", _connectionViewModel.Username);
+            ConfigManager.UpdateSetting("last_used_ip", _connectionViewModel.IPAddress);
+            ConfigManager.UpdateSetting("last_used_port", _connectionViewModel.Port);
+
             _echo.ConnectionStatus = ConnectionStatus.Connecting;
 
             _echo.CreateUser(_connectionViewModel.Username, _connectionViewModel.Anonymous);
