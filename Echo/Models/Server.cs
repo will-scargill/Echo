@@ -1,4 +1,5 @@
-﻿using Echo.Managers;
+﻿using Echo.Commands;
+using Echo.Managers;
 using Echo.Net;
 using Echo.ViewModels;
 using Newtonsoft.Json;
@@ -7,11 +8,15 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.Foundation.Metadata;
+using static Echo.Managers.EncryptionManager;
 
 namespace Echo.Models
 {
@@ -28,6 +33,8 @@ namespace Echo.Models
         private Socket _conn { get; set; }
 
         private bool _receiving { get; set; }
+
+        private bool _anon { get; set; }
 
         private readonly User _user;
 
@@ -177,9 +184,10 @@ namespace Echo.Models
             }
         }
 
-        public async Task<bool> Handshake()
+        public async Task<bool> Handshake(bool anon)
         {
             return await Task.Run(() => {
+                _anon = anon;
                 if (_receiving)
                 {
                     Disconnect();
@@ -189,21 +197,51 @@ namespace Echo.Models
                 {
                     try
                     {
-                        Dictionary<string, string> message;
+                        string publicKey;
+                        string privateKey;
+                        if (anon)
+                        {
+                            RSACryptoServiceProvider rsa = EncryptionManager.GetTempRSAProvider();
+                            TextWriter tw = new StringWriter();
 
-                        SendMessageToServer("serverInfoRequest", "", enc: false);
+                            EncryptionManager.PemKeyUtils.ExportPublicKey(rsa, tw);
+
+                            publicKey = tw.ToString();
+
+                            tw = new StringWriter();
+
+                            EncryptionManager.PemKeyUtils.ExportPrivateKey(rsa, tw);
+
+                            privateKey = tw.ToString();
+                        } else
+                        {
+                            publicKey = EncryptionManager.GetRSAPublicKey();
+                            privateKey = null;
+                        }
+                        Dictionary<string, string> message;
+                        SendMessageToServer("serverInfoRequest", publicKey, enc: false);
 
                         message = ReceiveMessageFromServer(); // Receive serverInfo
 
                         KeyGenerator.SecretKey = KeyGenerator.GetUniqueKey(16);
 
-                        SendMessageToServer("clientSecret", EncryptionManager.RSAEncrypt(KeyGenerator.SecretKey, message["data"].ToString()), enc: false);
+                        SendMessageToServer("clientSecret", EncryptionManager.RSAEncryptWithPem(KeyGenerator.SecretKey, message["data"].ToString()), enc: false);
 
                         message = ReceiveMessageFromServer(true); // Receive gotSecret
 
+                        string tokenEncrypted = message["data"];
+                        string token;
+                        if (anon)
+                        {
+                            token = EncryptionManager.RSADecryptWithPem(tokenEncrypted, privateKey);
+                        } else
+                        {
+                            token = EncryptionManager.RSADecrypt(tokenEncrypted);
+                        }                       
+
                         string version = ConfigManager.GetSetting("version");
 
-                        List<string> connRequest = new List<string> { _user.Username, _serverPassword, version, "" };
+                        List<string> connRequest = new List<string> { _user.Username, _serverPassword, version, token, "" };
 
                         string jsonConnRequest = JsonConvert.SerializeObject(connRequest);
 
@@ -225,17 +263,28 @@ namespace Echo.Models
                         }
                         return false;
                     }
-                    catch (System.Net.Sockets.SocketException)
+                    catch (Exception ex)
                     {
                         _receiving = false;
                         _conn?.Close();
-                        _echo.connectionContext = "Failed to connect to server";
+                        
+
+                        if (ex is System.Net.Sockets.SocketException) {
+                            _echo.connectionContext = "Failed to connect to server - err_socket_dropped";
+                        } else if (ex is System.NullReferenceException) {
+                            _echo.connectionContext = "Failed to connect to server - err_client_nullref";
+                        } else if (ex is CryptographicException) {
+                            _echo.connectionContext = "Failed to connect to server - err_key_failed";
+                        } else {
+                            _echo.connectionContext = "Failed to connect to server - err_unknown_err";
+                        }
+
                         return false;
                     }
                 }
                 else
                 {
-                    _echo.connectionContext = "Failed to connect to server";
+                    _echo.connectionContext = "Failed to connect to server - err_no_connection";
                     return false;
                 }
             });
@@ -478,7 +527,7 @@ namespace Echo.Models
 
                     for (int reconnCounter = 0; reconnCounter < 3; reconnCounter++)
                     {                       
-                        reconnSuccess = Task.Run(Handshake).Result;
+                        reconnSuccess = Task.Run(() => Handshake(_anon)).Result;
 
                         if (reconnSuccess)
                         {

@@ -76,6 +76,7 @@ namespace Echo.ViewModels
         public ICommand ViewSettingsCommand { get; }
         public ICommand ToggleEchoIDCommand { get; }
         public ICommand ResetRSACommand { get; }
+        public ICommand CopyRSAPublicCommand { get; }
         public ICommand InstallThemeCommand { get; }
         public SettingsViewModel(EchoClient echo, NavigationStore navigationStore)
         {
@@ -85,6 +86,7 @@ namespace Echo.ViewModels
             ViewSettingsCommand = new ViewSettingsCommand(echo, navigationStore);
             ToggleEchoIDCommand = new ToggleEchoIDCommand(echo, this);
             ResetRSACommand = new ResetRSACommand(echo);
+            CopyRSAPublicCommand = new CopyRSAPublicCommand(echo);
             InstallThemeCommand = new InstallThemeCommand(echo);
 
             _EchoID = _echo.GetEchoID();

@@ -50,7 +50,7 @@
                             <Run Text=": "/>
                         </TextBlock>
                         <TextBox DockPanel.Dock="Left" Text="{Binding Content,Mode=OneWay}" IsReadOnly="True" 
-                                 TextWrapping="Wrap" BorderBrush="Transparent" Background="Transparent"/>
+                                 TextWrapping="Wrap" BorderBrush="Transparent" BorderThickness="0" Background="Transparent"/>
                     </DockPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
