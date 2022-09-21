@@ -99,7 +99,7 @@ namespace Echo.Models
             }
             else
             {
-                GetEchoID();
+                userID = GetEchoID();
             }
 
             user = new User(username, userID, anon);

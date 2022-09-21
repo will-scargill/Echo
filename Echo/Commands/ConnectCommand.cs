@@ -83,7 +83,7 @@ namespace Echo.Commands
 
             if (_echo.CreateServer(_connectionViewModel.IPAddress, Convert.ToInt32(_connectionViewModel.Port), _connectionViewModel.Password))
             {
-                Connect();
+                Connect(_connectionViewModel.Anonymous);
             } else
             {
                 _echo.connectionContext = "Unable to create Server object";
@@ -91,9 +91,9 @@ namespace Echo.Commands
             }    
         }
 
-        private async void Connect()
+        private async void Connect(bool anon)
         {
-            bool connected = await _echo.GetServer().Handshake();
+            bool connected = await _echo.GetServer().Handshake(anon);
 
             if (connected)
             {
