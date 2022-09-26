@@ -1,4 +1,6 @@
-﻿using Echo.Models;
+﻿using Echo.Managers;
+using Echo.Models;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,11 +18,16 @@ namespace Echo.Commands
         }
         public override bool CanExecute(object parameter)
         {
-            return false;
+            return true;
         }
         public override void Execute(object parameter)
         {
-            
+            OpenFileDialog ofd = new OpenFileDialog();
+            if (ofd.ShowDialog() == true)
+            {
+                // decode json
+                // VisualManager.Themes.InstallTheme();
+            }
         }
     }
 }

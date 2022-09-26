@@ -32,11 +32,18 @@ namespace Echo.Managers
             {
                 string text = System.IO.File.ReadAllText(@"echo_stored_presets.json");
                 Dictionary<string, List<object>> result = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, List<object>>>(text);
-                return result;
+                
+                if (result is null)
+                {
+                    return new Dictionary<string, List<object>>();
+                } else
+                {
+                    return result;
+                }
             } catch(System.IO.FileNotFoundException)
             {
                 File.Create(@"echo_stored_presets.json");
-                return null;
+                return new Dictionary<string, List<object>>();
             }         
         }
 
@@ -63,6 +70,15 @@ namespace Echo.Managers
                 string jsonData = JsonConvert.SerializeObject(currentPresets);
                 System.IO.File.WriteAllText(@"echo_stored_presets.json", jsonData);
             }
+        }
+
+        public static string GetAppDataPath()
+        {
+            string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+            string fp = Path.Combine(appDataPath, "echo");
+
+            return fp;
         }
     }
 }

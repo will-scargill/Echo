@@ -520,9 +520,6 @@ namespace Echo.Models
                     Disconnect();
                     App.Current.Dispatcher.Invoke(() => { _echo.ConnectionStatus = ConnectionStatus.Reconnecting;  });
 
-                    //VisualManager.SystemMessage("Error - Connection Lost");
-                    //VisualManager.SystemMessage("Trying to reconnect");
-
                     bool reconnSuccess = false;
 
                     for (int reconnCounter = 0; reconnCounter < 3; reconnCounter++)
@@ -545,10 +542,11 @@ namespace Echo.Models
                         }
                     }
                     if (!reconnSuccess)
-                    {
+                    {                    
                         App.Current.Dispatcher.Invoke(() => {
-                            _echo.ConnectionStatus = ConnectionStatus.Terminated;
                             _echo.connectionContext = "Failed to reconnect";
+                            _echo.ConnectionStatus = ConnectionStatus.Terminated;
+                            _echo.GetNavStore().CurrentViewModel = new ConnectionViewModel(_echo, _echo.GetNavStore());
                         });
                     }                                     
                 }

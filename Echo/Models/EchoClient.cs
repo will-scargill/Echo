@@ -67,7 +67,7 @@ namespace Echo.Models
                         entry.Value[0].ToString(),
                         Convert.ToInt32(entry.Value[1]),
                         entry.Key,
-                        entry.Value[2].ToString()
+                        entry.Value[2]?.ToString()
                     );
                 }
             }           

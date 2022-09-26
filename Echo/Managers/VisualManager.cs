@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -85,6 +86,19 @@ namespace Echo.Managers
         public static ListBox getMessageBox()
         {
             return messageBox;
+        }
+
+        public class Themes
+        {
+            public static bool LoadTheme(string themeKey)
+            {
+                throw new NotImplementedException();
+            }
+
+            public static bool InstallTheme(Dictionary<string, string> themeData)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }
